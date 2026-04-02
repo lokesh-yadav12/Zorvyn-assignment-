@@ -8,7 +8,7 @@ type SortField = 'date' | 'amount' | 'category';
 type SortOrder = 'asc' | 'desc';
 
 const Transactions = () => {
-  const { transactions, userRole, deleteTransaction } = useApp();
+  const { transactions, userRole, deleteTransaction, showConfirm } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -246,9 +246,10 @@ const Transactions = () => {
                           </button>
                           <button
                             onClick={() => {
-                              if (confirm('Are you sure you want to delete this transaction?')) {
-                                deleteTransaction(transaction.id);
-                              }
+                              showConfirm(
+                                'Are you sure you want to delete this transaction?',
+                                () => deleteTransaction(transaction.id)
+                              );
                             }}
                             className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400 transition-colors"
                           >

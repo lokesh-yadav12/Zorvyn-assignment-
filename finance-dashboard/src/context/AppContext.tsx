@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Transaction, UserRole } from '../types';
 import { generateMockTransactions } from '../utils/mockData';
+import { useToast } from '../hooks/useToast';
+import { useConfirm } from '../hooks/useConfirm';
+import ToastContainer from '../components/ToastContainer';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 interface AppContextType {
   transactions: Transaction[];
@@ -9,13 +13,18 @@ interface AppContextType {
   setUserRole: (role: UserRole) => void;
   toggleDarkMode: () => void;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
-  updateTransaction: (id: string, transaction: Partial<Transaction>) => void;
+  updateTransaction: (id: string, updatedData: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
+  showToast: (message: string, type: 'success' | 'error' | 'warning' | 'info') => void;
+  showConfirm: (message: string, onConfirm: () => void) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { toasts, showToast: toast, removeToast } = useToast();
+  const { confirmState, showConfirm: confirm, hideConfirm } = useConfirm();
+  
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     const saved = localStorage.getItem('transactions');
     return saved ? JSON.parse(saved) : generateMockTransactions();
@@ -56,16 +65,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       id: Date.now().toString(),
     };
     setTransactions([newTransaction, ...transactions]);
+    toast('Transaction added successfully', 'success');
   };
 
   const updateTransaction = (id: string, updatedData: Partial<Transaction>) => {
     setTransactions(transactions.map(t => 
       t.id === id ? { ...t, ...updatedData } : t
     ));
+    toast('Transaction updated successfully', 'success');
   };
 
   const deleteTransaction = (id: string) => {
     setTransactions(transactions.filter(t => t.id !== id));
+    toast('Transaction deleted successfully', 'success');
   };
 
   return (
@@ -78,8 +90,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       addTransaction,
       updateTransaction,
       deleteTransaction,
+      showToast: toast,
+      showConfirm: confirm,
     }}>
       {children}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      <ConfirmDialog
+        isOpen={confirmState.isOpen}
+        message={confirmState.message}
+        onConfirm={() => {
+          confirmState.onConfirm();
+          hideConfirm();
+        }}
+        onCancel={hideConfirm}
+      />
     </AppContext.Provider>
   );
 };
