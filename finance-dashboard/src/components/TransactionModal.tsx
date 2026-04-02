@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { X } from 'lucide-react';
-import { Transaction } from '../types';
+//import { Transaction } from '../types';
 
 interface TransactionModalProps {
   transactionId: string | null;
