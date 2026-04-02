@@ -218,7 +218,7 @@ const Dashboard = () => {
           </ResponsiveContainer>
           
           <div className="space-y-3">
-            {categoryData.map((cat, index) => (
+            {categoryData.map((cat) => (
               <div key={cat.name} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }} />
